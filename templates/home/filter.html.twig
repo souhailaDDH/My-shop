@@ -4,25 +4,7 @@
 
 {% block body %}
     <div class="container">
-
-        <div class="card mb-12" style="margin-top: 70px">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="{{ asset('uploads/images/'~product.image) }}" class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h1 class="card-title text-success">{{ product.name }}</h1>
-                        <p class="card-text">{{ product.description }}</p>
-                        <h3>{{ product.price }} EUR</h3>
-                        <a href="" class="text-success">add to card</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <h2>Latest Added Products</h2>
-
+        <h1>{{ subCategory.name }}</h1>
         <div class="row">
             {% for product in products %}
                 <div class="col-md-3 mt-4">
