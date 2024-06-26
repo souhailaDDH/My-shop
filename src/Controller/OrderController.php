@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\City;
 use App\Entity\Order;
+use App\Entity\OrderProducts;
 use App\Form\OrderType;
 use App\Repository\ProductRepository;
 use App\Service\Cart;
@@ -24,17 +25,8 @@ class OrderController extends AbstractController
        Cart $cart,
     ): Response
     {
-        $cart = $session->get('cart',[]);
-        $cartWhitData = [];
-        foreach ($cart as $id=>$quantity){
-            $cartWhitData[] = [
-                'product'=>$productRepository->find($id),
-                'quantity'=>$quantity
-            ];
-        }
-        $total = array_sum(array_map(function ($item){
-            return $item['product']->getPrice() * $item['quantity'];
-        },$cartWhitData));
+
+       $data = $cart->getCart($session);
 
        $order = new Order();
        $form = $this->createForm(OrderType::class, $order);
@@ -43,6 +35,24 @@ class OrderController extends AbstractController
        if ($form->isSubmitted() && $form->isValid()){
 
            if ($order->isPayOnDelivery()){
+             if (!empty($data['total'])){
+                   $order->setTotalPrice($data['total']);
+                   $order->setCreatedAt(new \DateTimeImmutable());
+                   $entityManager->persist($order);
+                   $entityManager->flush();
+
+                   foreach ($data['cart'] as $value){
+                       $orderProduct = new OrderProducts();
+                       $orderProduct->setOrder($order);
+                       $orderProduct->setProduct($value['product']);
+                       $orderProduct->setQte($value['quantity']);
+                       $entityManager->persist($orderProduct);
+                       $entityManager->flush();
+                   }
+             }
+
+             $session->set('cart',[]);
+             return $this->redirectToRoute('order_ok_message');
 
            }
 
@@ -50,8 +60,14 @@ class OrderController extends AbstractController
 
         return $this->render('order/index.html.twig', [
             'form'=>$form->createView(),
-            'total'=>$total
+            'total'=>$data['total']
         ]);
+    }
+
+    #[Route("/order-ok-message", name: 'order_ok_message')]
+    public function orderMessage():Response
+    {
+        return $this->render('order/order_message.twig');
     }
 
     #[Route('/city/{id}/shipping/cost', name: 'app_city_shipping_cost')]
