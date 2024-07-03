@@ -43,6 +43,12 @@ class Order
     #[ORM\Column]
     private ?float $totalPrice = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isCompleted = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
+
     public function __construct()
     {
         $this->orderProducts = new ArrayCollection();
@@ -177,6 +183,30 @@ class Order
     public function setTotalPrice(float $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function isIsCompleted(): ?bool
+    {
+        return $this->isCompleted;
+    }
+
+    public function setIsCompleted(?bool $isCompleted): static
+    {
+        $this->isCompleted = $isCompleted;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
 
         return $this;
     }

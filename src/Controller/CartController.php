@@ -20,7 +20,6 @@ class CartController extends AbstractController
     {
 
         $data = $cart->getCart($session);
-
         return $this->render('cart/index.html.twig', [
             'items'=>$data['cart'],
             'total'=>$data['total']

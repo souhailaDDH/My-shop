@@ -6,23 +6,35 @@ use App\Entity\City;
 use App\Entity\Order;
 use App\Entity\OrderProducts;
 use App\Form\OrderType;
+use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use App\Service\Cart;
+use App\Service\StripePayment;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 class OrderController extends AbstractController
 {
+    public function __construct(private MailerInterface $mailer){}
+
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/order', name: 'app_order')]
     public function index(Request $request,
        SessionInterface $session,
        ProductRepository $productRepository,
        EntityManagerInterface $entityManager,
        Cart $cart,
+       OrderRepository $orderRepository,
     ): Response
     {
 
@@ -52,9 +64,34 @@ class OrderController extends AbstractController
              }
 
              $session->set('cart',[]);
+
+
+
+             $html = $this->renderView('mail/orderConfirm.html.twig',[
+                 'order'=>$order
+             ]);
+
+             $email = (new  Email())
+             ->from('myShop@gmail.com')
+             ->to($order->getEmail())
+             ->subject('Confirmation de reception de la commande')
+             ->html($html);
+
+             $this->mailer->send($email);
+
              return $this->redirectToRoute('order_ok_message');
 
            }
+
+           $payment = new StripePayment();
+
+           $shippingCost = $order->getCity()->getShippingCost();
+
+           $payment->startPayment($data,$shippingCost);
+
+           $stripeRedirectUrl = $payment->getStripeRedirectUrl();
+
+           return $this->redirect($stripeRedirectUrl);
 
        }
 
@@ -64,6 +101,39 @@ class OrderController extends AbstractController
         ]);
     }
 
+    #[Route('/editor/order', name: 'app_orders_show')]
+    public function getAllOrder(OrderRepository $orderRepository, Request $request, PaginatorInterface $paginator):Response
+    {
+        $data = $orderRepository->findBy([],['id'=>'DESC']);
+        //dd($order);
+        $order = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            10
+        );
+        return $this->render('order/order.html.twig',[
+            "orders"=>$order
+        ]);
+    }
+
+    #[Route('/editor/order/{id}/is-completed/update', name: 'app_orders_is_completed_update')]
+    public function isCompletedUpdate($id,OrderRepository $orderRepository, EntityManagerInterface $entityManager):Response
+    {
+       $order = $orderRepository->find($id) ;
+       $order->setIsCompleted(true);
+       $entityManager->flush();
+       $this->addFlash('success','modification effectuée');
+       return $this->redirectToRoute('app_orders_show');
+    }
+
+    #[Route('/editor/order/{id}/remove', name: 'app_orders_remove')]
+    public function removeOrder(Order $order, EntityManagerInterface $entityManager):Response
+    {
+        $entityManager->remove($order);
+        $entityManager->flush();
+        $this->addFlash('danger','Votre commande a été supprimée');
+        return $this->redirectToRoute('app_orders_show');
+    }
     #[Route("/order-ok-message", name: 'order_ok_message')]
     public function orderMessage():Response
     {
