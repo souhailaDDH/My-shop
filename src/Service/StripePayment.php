@@ -55,11 +55,10 @@ class StripePayment
            'shipping_address_collection' => [
                'allowed_countries' => ['FR',"CM"]
            ],
-           'metadata'=>[
-                'nom'=>'vincent',
-                'shippingCost'=>$shippingCost,
-                'prénom'=>'nash'
-           ]
+            'metadata' => [
+
+            ]
+
         ]);
 
         $this->redirectUrl = $session->url;

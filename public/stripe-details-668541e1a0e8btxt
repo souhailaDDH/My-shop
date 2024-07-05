@@ -1,0 +1,66 @@
+Stripe\PaymentIntent JSON: {
+    "id": "pi_3PYS9zE8ItOMFxCF0aVbi9P1",
+    "object": "payment_intent",
+    "amount": 3900,
+    "amount_capturable": 0,
+    "amount_details": {
+        "tip": []
+    },
+    "amount_received": 3900,
+    "application": null,
+    "application_fee_amount": null,
+    "automatic_payment_methods": null,
+    "canceled_at": null,
+    "cancellation_reason": null,
+    "capture_method": "automatic_async",
+    "client_secret": "pi_3PYS9zE8ItOMFxCF0aVbi9P1_secret_k4v2o4GsCe9l4ZxDTjbDDT181",
+    "confirmation_method": "automatic",
+    "created": 1720009183,
+    "currency": "eur",
+    "customer": null,
+    "description": null,
+    "invoice": null,
+    "last_payment_error": null,
+    "latest_charge": "ch_3PYS9zE8ItOMFxCF0Ju2jhyd",
+    "livemode": false,
+    "metadata": [],
+    "next_action": null,
+    "on_behalf_of": null,
+    "payment_method": "pm_1PYS9xE8ItOMFxCF8928KyvT",
+    "payment_method_configuration_details": null,
+    "payment_method_options": {
+        "card": {
+            "installments": null,
+            "mandate_options": null,
+            "network": null,
+            "request_three_d_secure": "automatic"
+        }
+    },
+    "payment_method_types": [
+        "card"
+    ],
+    "processing": null,
+    "receipt_email": null,
+    "review": null,
+    "setup_future_usage": null,
+    "shipping": {
+        "address": {
+            "city": "yaound\u00e9",
+            "country": "CM",
+            "line1": "simbok",
+            "line2": null,
+            "postal_code": "",
+            "state": null
+        },
+        "carrier": null,
+        "name": "vincent djoufack",
+        "phone": null,
+        "tracking_number": null
+    },
+    "source": null,
+    "statement_descriptor": null,
+    "statement_descriptor_suffix": null,
+    "status": "succeeded",
+    "transfer_data": null,
+    "transfer_group": null
+}

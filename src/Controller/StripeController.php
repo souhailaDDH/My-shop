@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Stripe\Stripe;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,47 @@ class StripeController extends AbstractController
         return $this->render('stripe/index.html.twig', [
             'controller_name' => 'StripeController',
         ]);
+    }
+
+
+    #[Route('/stripe/notify', name: 'app_stripe_notify')]
+    public function stripeNotify(Request $request):Response
+    {
+        Stripe::setApiKey($_SERVER['STRIPE_SECRET']);
+
+        $endpoint_secret = 'whsec_a603cefd33cbfca538489edad3030a9d7c7a75705585210aeb19ef8572732b52';
+
+        $payload = $request->getContent();
+
+        $sig_header = $request->headers->get('stripe-signature');
+
+        $event = null;
+
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+              $payload, $sig_header,$endpoint_secret
+            );
+        }catch (\UnexpectedValueException $e){
+            return new Response('payload invalide', 400);
+        }catch (\Stripe\Exception\SignatureVerificationException $e){
+            return new Response('Signature invalide');
+        }
+
+        switch ($event->type){
+            case 'payment_intent.succeeded': /// contient l'obet payment_intent
+                $paymentIntent = $event->data->object;
+
+                $fileName = 'stripe-details-'.uniqid().'txt';
+                file_put_contents($fileName,$paymentIntent);
+                break;
+            case 'payment_method.attached': /// contient l'objet payment_method
+                $paymentMethod = $event->data->object;
+                break;
+            default :
+                break;
+        }
+
+        return new Response('evenement recu',200);
     }
 
 }
