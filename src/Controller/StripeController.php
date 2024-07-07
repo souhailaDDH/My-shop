@@ -2,17 +2,22 @@
 
 namespace App\Controller;
 
+use App\Repository\OrderRepository;
+use App\Service\Cart;
+use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Stripe;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class StripeController extends AbstractController
 {
     #[Route('/pay/success', name: 'app_stripe_success')]
-    public function success(): Response
+    public function success(Cart $cart,SessionInterface $session): Response
     {
+        $session->set('cart',[]);
         return $this->render('stripe/index.html.twig', [
             'controller_name' => 'StripeController',
         ]);
@@ -28,7 +33,7 @@ class StripeController extends AbstractController
 
 
     #[Route('/stripe/notify', name: 'app_stripe_notify')]
-    public function stripeNotify(Request $request):Response
+    public function stripeNotify(Request $request, OrderRepository $orderRepository, EntityManagerInterface $entityManager):Response
     {
         Stripe::setApiKey($_SERVER['STRIPE_SECRET']);
 
@@ -54,8 +59,22 @@ class StripeController extends AbstractController
             case 'payment_intent.succeeded': /// contient l'obet payment_intent
                 $paymentIntent = $event->data->object;
 
-                $fileName = 'stripe-details-'.uniqid().'txt';
-                file_put_contents($fileName,$paymentIntent);
+                $fileName = 'stripe-details-'.uniqid().'.txt';
+
+                $orderId = $paymentIntent->metadata->orderId;
+
+                $order = $orderRepository->find($orderId);
+
+                $cartPrice = $order->getTotalPrice();
+                $stripeTotalAmount = $paymentIntent->amount/100;
+
+                if ($cartPrice==$stripeTotalAmount){
+                    $order->setIsPaymentCompleted(1);
+                    $entityManager->flush();
+                }
+
+
+                //file_put_contents($fileName,$orderId);
                 break;
             case 'payment_method.attached': /// contient l'objet payment_method
                 $paymentMethod = $event->data->object;
