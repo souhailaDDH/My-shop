@@ -1,35 +1,86 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion{% endblock %}
 
 {% block body %}
-    <div class="container security-form">
-        <form method="post" class="login-form">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <!-- Formulaire de connexion -->
+                <div class="card shadow-lg border-0 rounded-lg p-4" style="background-color: #fff2f7;">
+                    <h1 class="text-center text-danger mb-4" style="font-weight: bold; font-size: 2rem;">Se connecter</h1>
 
-            {% if error %}
-                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {% endif %}
+                    {% if error %}
+                        <div class="alert alert-danger text-center">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
 
-            {% if app.user %}
-                <div class="mb-3">
-                    You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    {% if app.user %}
+                        <div class="mb-3 text-center">
+                            Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}" class="text-danger">Se déconnecter</a>
+                        </div>
+                    {% endif %}
+
+                    <!-- Formulaire de connexion -->
+                    <form method="post" class="login-form">
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="inputEmail" class="form-label">Email</label>
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control form-control-lg" autocomplete="email" required autofocus placeholder="Votre email" style="border-color: #f9c0c7;">
+                        </div>
+
+                        <!-- Mot de passe -->
+                        <div class="mb-3">
+                            <label for="inputPassword" class="form-label">Mot de passe</label>
+                            <input type="password" name="password" id="inputPassword" class="form-control form-control-lg" autocomplete="current-password" required placeholder="Votre mot de passe" style="border-color: #f9c0c7;">
+                        </div>
+
+                        <!-- Token CSRF -->
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <!-- Bouton de soumission -->
+                        <div class="text-center">
+                            <button class="btn btn-lg btn-danger w-100" type="submit" style="font-weight: bold; background-color: #f9c0c7; border-color: #f9c0c7; transition: 0.3s ease; border-radius: 50px;">
+                                Se connecter
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p class="small">Vous n'avez pas de compte ? <a href="{{ path('app_register') }}" class="text-danger">Inscrivez-vous ici</a></p>
+                    </div>
                 </div>
-            {% endif %}
-
-            <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
-            <label for="inputEmail">Email</label>
-            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-            <label for="inputPassword">Password</label>
-            <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-
-            <input type="hidden" name="_csrf_token"
-                   value="{{ csrf_token('authenticate') }}"
-            >
-
-            <br>
-            <button class="btn btn-lg btn-primary btn-block" type="submit">
-                Sign in
-            </button>
-        </form>
+            </div>
+        </div>
     </div>
+
+{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        /* Bouton interactif */
+        .btn-danger:hover {
+            background-color: #f7a1b5;
+            border-color: #f7a1b5;
+        }
+        
+        /* Effet de focus sur les champs de formulaire */
+        .form-control:focus {
+            border-color: #f9c0c7;
+            box-shadow: 0 0 5px rgba(255, 105, 180, 0.8);
+        }
+
+        /* Animation et design général */
+        body {
+            background-color: #fff2f7;
+        }
+
+        .card {
+            background-color: #fff2f7;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-danger {
+            font-weight: bold;
+        }
+    </style>
 {% endblock %}

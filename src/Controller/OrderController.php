@@ -47,7 +47,7 @@ class OrderController extends AbstractController
        if ($form->isSubmitted() && $form->isValid()){
 
              if (!empty($data['total'])){
-                   $totalPrice = $data['total'] + $order->getCity()->getShippingCost();
+                   $totalPrice = $data['total'] ;
                    $order->setTotalPrice($totalPrice);
                    $order->setCreatedAt(new \DateTimeImmutable());
                    $order->setIsPaymentCompleted(0);
@@ -63,7 +63,7 @@ class OrderController extends AbstractController
                        $entityManager->flush();
                    }
 
-                 if ($order->isPayOnDelivery()){
+                 //if ($order->isPayOnDelivery()){
                      $session->set('cart',[]);
 
                      $html = $this->renderView('mail/orderConfirm.html.twig',[
@@ -78,21 +78,21 @@ class OrderController extends AbstractController
 
                      $this->mailer->send($email);
 
-                     return $this->redirectToRoute('order_ok_message');
+                     //return $this->redirectToRoute('order_ok_message');
 
-                 }
+                 //}
 
                  $payment = new StripePayment();
 
-                 $shippingCost = $order->getCity()->getShippingCost();
+                 //$shippingCost = $order->getCity()->getShippingCost();
 
-                 $payment->startPayment($data,$shippingCost,$order->getId());
+                 $payment->startPayment($data,0,$order->getId());
 
                  $stripeRedirectUrl = $payment->getStripeRedirectUrl();
-
+        //dump($stripeRedirectUrl);die;
                  return $this->redirect($stripeRedirectUrl);
 
-             }
+                }
 
 
 
@@ -100,7 +100,8 @@ class OrderController extends AbstractController
 
         return $this->render('order/index.html.twig', [
             'form'=>$form->createView(),
-            'total'=>$data['total']
+            'total'=>$data['total'],
+            'totalPrice'=>$data['total']
         ]);
     }
 
@@ -110,9 +111,9 @@ class OrderController extends AbstractController
         if ($type == 'is-completed'){
             $data = $orderRepository->findBy(['isCompleted'=>1],['id'=>'DESC']);
         }elseif ($type == 'pay-on-stripe-not-delivered'){
-            $data = $orderRepository->findBy(['isCompleted'=>null,'payOnDelivery'=>0,'isPaymentCompleted'=>1],['id'=>'DESC']);
+            $data = $orderRepository->findBy(['isCompleted'=>null,'isPaymentCompleted'=>1],['id'=>'DESC']);
         }elseif ($type == 'pay-on-stripe-is-delivered'){
-            $data = $orderRepository->findBy(['isCompleted'=>1,'payOnDelivery'=>0,'isPaymentCompleted'=>1],['id'=>'DESC']);
+            $data = $orderRepository->findBy(['isCompleted'=>1,'isPaymentCompleted'=>1],['id'=>'DESC']);
         }
 
         //dd($order);

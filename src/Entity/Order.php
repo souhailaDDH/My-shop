@@ -34,8 +34,9 @@ class Order
     #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?City $city = null;
 
-    #[ORM\Column]
-    private ?bool $payOnDelivery = null;
+    // Suppression de la propriété payOnDelivery
+    // #[ORM\Column]
+    // private ?bool $payOnDelivery = null;
 
     #[ORM\OneToMany(targetEntity: OrderProducts::class, mappedBy: '_order', orphanRemoval: true)]
     private Collection $orderProducts;
@@ -55,6 +56,7 @@ class Order
     public function __construct()
     {
         $this->orderProducts = new ArrayCollection();
+        //$this->email="souhaila@gmail.com";
     }
 
     public function getId(): ?int
@@ -110,8 +112,6 @@ class Order
         return $this;
     }
 
-
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -136,17 +136,18 @@ class Order
         return $this;
     }
 
-    public function isPayOnDelivery(): ?bool
-    {
-        return $this->payOnDelivery;
-    }
+    // Suppression des méthodes liées à "payOnDelivery"
+    // public function isPayOnDelivery(): ?bool
+    // {
+    //     return $this->payOnDelivery;
+    // }
 
-    public function setPayOnDelivery(bool $payOnDelivery): static
-    {
-        $this->payOnDelivery = $payOnDelivery;
+    // public function setPayOnDelivery(bool $payOnDelivery): static
+    // {
+    //     $this->payOnDelivery = $payOnDelivery;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, OrderProducts>
@@ -169,7 +170,6 @@ class Order
     public function removeOrderProduct(OrderProducts $orderProduct): static
     {
         if ($this->orderProducts->removeElement($orderProduct)) {
-            // set the owning side to null (unless already changed)
             if ($orderProduct->getOrder() === $this) {
                 $orderProduct->setOrder(null);
             }

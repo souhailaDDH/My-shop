@@ -14,11 +14,11 @@ class OrderProducts
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderProducts')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Order $_order = null;
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Order $order = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderProducts')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Product $product = null;
 
     #[ORM\Column]
@@ -31,13 +31,12 @@ class OrderProducts
 
     public function getOrder(): ?Order
     {
-        return $this->_order;
+        return $this->order;
     }
 
-    public function setOrder(?Order $_order): static
+    public function setOrder(?Order $order): static
     {
-        $this->_order = $_order;
-
+        $this->order = $order;
         return $this;
     }
 
@@ -49,7 +48,6 @@ class OrderProducts
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
-
         return $this;
     }
 
@@ -61,7 +59,6 @@ class OrderProducts
     public function setQte(int $qte): static
     {
         $this->qte = $qte;
-
         return $this;
     }
 }

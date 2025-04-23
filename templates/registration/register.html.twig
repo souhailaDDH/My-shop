@@ -1,29 +1,84 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription{% endblock %}
 
 {% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <!-- Formulaire d'inscription -->
+                <div class="card shadow-lg border-0 rounded-lg p-4" style="background-color: #fff2f7;">
+                    <h1 class="text-center text-danger mb-4" style="font-weight: bold; font-size: 2rem;">S'inscrire</h1>
 
-    <div class="container security-form">
-        <div class="login-form">
-            <h1>Inscription</h1>
+                    <!-- Affichage des erreurs -->
+                    {{ form_errors(registrationForm) }}
 
-            {{ form_errors(registrationForm) }}
+                    <!-- Formulaire d'inscription -->
+                    {{ form_start(registrationForm, {'attr': {'class': 'form'}}) }}
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Votre email', 'style': 'border-color: #f9c0c7;'}}) }}
+                        </div>
 
-            {{ form_start(registrationForm) }}
+                        <!-- Nom -->
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Votre nom', 'style': 'border-color: #f9c0c7;'}}) }}
+                        </div>
 
-                {{ form_widget(registrationForm.email,{'attr':{'class':'form form-control','placeholder':"email"}}) }}
-            <br>
+                        <!-- Prénom -->
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Votre prénom', 'style': 'border-color: #f9c0c7;'}}) }}
+                        </div>
 
-                {{ form_widget(registrationForm.firstName,{'attr':{'class':'form form-control','placeholder':"nom"}}) }}
-            <br>
-                {{ form_widget(registrationForm.lastName,{'attr':{'class':'form form-control','placeholder':"prenom"}}) }}
-            <br>
-                {{ form_widget(registrationForm.plainPassword,{'attr':{'class':'form form-control','placeholder':"mot de passe"}}) }}
-                {{ form_row(registrationForm.agreeTerms) }}
+                        <!-- Mot de passe -->
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Mot de passe', 'style': 'border-color: #f9c0c7;'}}) }}
+                        </div>
 
-                <button type="submit" class="btn btn-block btn-primary">Register</button>
-            {{ form_end(registrationForm) }}
+                        <!-- Accepter les termes -->
+                        <div class="mb-4">
+                            {{ form_row(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                            <label class="form-check-label" for="agreeTerms" style="font-size: 0.875rem;">J'accepte les <a href="#" class="text-danger">termes et conditions</a>.</label>
+                        </div>
+
+                        <!-- Bouton de soumission -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-lg btn-danger w-100" style="font-weight: bold; background-color: #f9c0c7; border-color: #f9c0c7; transition: 0.3s ease; border-radius: 50px;">
+                                S'inscrire
+                            </button>
+                        </div>
+                        
+                    {{ form_end(registrationForm) }}
+                </div>
+            </div>
         </div>
     </div>
+
+{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        /* Effet de survol pour le bouton */
+        .btn-danger:hover {
+            background-color: #f7a1b5;
+            border-color: #f7a1b5;
+        }
+        
+        /* Effet de focus sur les champs de formulaire */
+        .form-control:focus {
+            border-color: #f9c0c7;
+            box-shadow: 0 0 5px rgba(255, 105, 180, 0.8);
+        }
+
+        /* Animations et styles pour le fond */
+        body {
+            background-color: #fff2f7;
+        }
+        
+        .card {
+            background-color: #fff2f7;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 {% endblock %}
